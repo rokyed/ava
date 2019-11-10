@@ -1,0 +1,30 @@
+{
+  "name": "ava",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rokyed/ava.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rokyed/ava/issues"
+  },
+  "homepage": "https://github.com/rokyed/ava#readme",
+  "dependencies": {
+    "axios": "^0.19.0",
+    "body-parser": "^1.19.0",
+    "dotenv": "^8.2.0",
+    "email-validator": "^2.0.4",
+    "express": "^4.17.1",
+    "moment": "^2.24.0",
+    "pg": "^7.12.1",
+    "salted-md5": "^4.0.2",
+    "sha.js": "^2.4.11"
+  }
+}
