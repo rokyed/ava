@@ -36,6 +36,9 @@ router.route('/logout').post(async (req, res, next) => {
 })
 
 router.route('/register').post(async (req, res, next) => {
+	if (!req.body.userinfo)
+		return next(new Error('missing userinfo'))
+
 	let k = null
 	let userinfoCheck = authMethods.checkInputUserInfo(req.body.userinfo)
 
@@ -54,7 +57,7 @@ router.route('/register').post(async (req, res, next) => {
 		if (await authMethods.checkUsernameExists(req.db_client, req.body.username))
 			throw new Error('user exits already')
 
-		await authMethods.registerUser(req.db_cient, req.body.username, req.body.password, req.body.userinfo)
+		await authMethods.registerUser(req.db_client, req.body.username, req.body.password, req.body.userinfo)
 
 		if (await authMethods.validateUser(req.db_client, req.body.username, req.body.password)) {
 			k = await authMethods.getSession(req.db_client, req.body.username)
@@ -63,8 +66,6 @@ router.route('/register').post(async (req, res, next) => {
 		}
 	} catch (e) {
 		return next(e)
-	} finally {
-		await client.release()
 	}
 
 	res.json({

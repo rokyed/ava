@@ -1,5 +1,6 @@
 require('dotenv').config()
-
+const { Pool } = require('pg')
+const dbinit = require('./dbinit.js')
 const auth = require('./test/auth.js')
 const {
 	APP_PORT = 15000,
@@ -10,7 +11,18 @@ const config = {
 }
 
 async function test() {
-	auth.test(config)
+	let pool = new Pool()
+	let client = await pool.connect()
+	try {
+		await dbinit(client)
+		console.log('initialization of database done!!')
+		await auth.test(config)
+		console.log('testing done')
+	} catch (e) {
+		console.error(e.message)
+	}
+
+	process.exit(0)
 }
 
 if (! (+TEST)) {

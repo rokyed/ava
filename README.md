@@ -21,7 +21,9 @@ WARNING: DO NOT LET YOUR PRODUCTION HAVE **TEST=1** IN ENV VARS !!
 #### TODO:
 
 - automated tests
-- user login/logout
-- user role
 - user info
 - user session
+- user validate session
+- user get role
+- forgot password generate email
+- change password with email token
