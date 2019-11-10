@@ -18,7 +18,7 @@ app.use((req, res, next) => {
 	next()
 })
 
-app.use('/auth', require('./modules/auth.js'))
+app.use('/auth', require('./modules/auth/auth.js'))
 
 app.use((req, res, next) => {
   return res.status(200).json({
