@@ -27,10 +27,11 @@ module.exports = {
 	userLogin: async (c) => {
 		let res = await axios.post(`${c.host}/auth/login`, ident)
 
-		return res.data.token
+		return res.data.api_token
 	},
 
 	userRegister: async (c) => {
+		console.log('registering')
 		let regUsr = {
 			userinfo: {}
 		}
@@ -45,22 +46,25 @@ module.exports = {
 		regUsr.password_repeat = regUsr.password
 		let res = await axios.post(`${c.host}/auth/register`, regUsr)
 
-		return res.data.token
+		return res.data.api_token
 	},
 
 	userLogout: async (c, token) => {
+		console.log('logging out')
 		let res = await axios.post(`${c.host}/auth/logout`, {
 			token
 		})
 	},
 
 	getUserInfo: async (c) => {
+		console.log('getting user info')
 		let res = await axios.get(`${c.host}/auth/userinfo`, {
 			token
 		})
 	},
 
 	setUserInfo: async (c) => {
+		console.log('setting user info')
 		let reqObj = {
 			token
 		}
@@ -72,12 +76,14 @@ module.exports = {
 	},
 
 	test: async function(c) {
-		console.log('testing registering')
+		console.log('> testing registering <')
 		let token = await this.userRegister(c)
+		console.log('current token: ', token)
 		await this.userLogout(c, token)
 
-		console.log('testing login')
+		console.log('> testing login <')
 		token = await this.userLogin(c)
+		console.log('current token: ', token)
 		await this.userLogout(c, token)
 	}
 }

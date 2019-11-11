@@ -1,15 +1,18 @@
 var express = require('express')
 var router = express.Router()
 const emailValidator = require("email-validator");
-const authMethods = require('./authMethods.js')
+const userMethods = require('./userMethods.js')
+const identMethods = require('./identMethods.js')
+const roleMethods = require('./roleMethods.js')
+const emailTokenMethods = require('./emailTokenMethods.js')
 
 router.route('/login').post(async (req, res, next) => {
 	let token = null
 
 	try {
-		if (await authMethods.validateUser(req.db_client, req.body.username, req.body.password)) {
-			await authMethods.deleteAllSessionsFor(req.db_client, req.body.username)
-			token = await authMethods.getSession(req.db_client, req.body.username)
+		if (await userMethods.validateUser(req.db_client, req.body.username, req.body.password)) {
+			await identMethods.deleteAllSessionsFor(req.db_client, req.body.username)
+			token = await identMethods.getSession(req.db_client, req.body.username)
 		} else {
 			throw new Error('wrong user or password')
 		}
@@ -25,7 +28,7 @@ router.route('/login').post(async (req, res, next) => {
 
 router.route('/logout').post(async (req, res, next) => {
 	try {
-		await authMethods.deleteSession(req.db_client, req.body.session)
+		await identMethods.deleteSession(req.db_client, req.body.session)
 	} catch (e) {
 		return next(e)
 	}
@@ -40,7 +43,7 @@ router.route('/register').post(async (req, res, next) => {
 		return next(new Error('missing userinfo'))
 
 	let k = null
-	let userinfoCheck = authMethods.checkInputUserInfo(req.body.userinfo)
+	let userinfoCheck = userMethods.checkInputUserInfo(req.body.userinfo)
 
 	if (userinfoCheck !== true) {
 		return next(new Error('missing fields: '+userinfoCheck.join(' ')))
@@ -54,13 +57,16 @@ router.route('/register').post(async (req, res, next) => {
 		return next(new Error('email incorrect'))
 
 	try {
-		if (await authMethods.checkUsernameExists(req.db_client, req.body.username))
+		if (await userMethods.checkUsernameExists(req.db_client, req.body.username))
 			throw new Error('user exits already')
 
-		await authMethods.registerUser(req.db_client, req.body.username, req.body.password, req.body.userinfo)
+		await userMethods.createUser(req.db_client, req.body.username, req.body.password)
+		await userMethods.createUserInfo(req.db_client, req.body.username, req.body.userinfo)
+		await roleMethods.createUserRole(req.db_client, req.body.username)
+		await emailTokenMethods.generateEmailValidateToken(req.db_client, req.body.username)
 
-		if (await authMethods.validateUser(req.db_client, req.body.username, req.body.password)) {
-			k = await authMethods.getSession(req.db_client, req.body.username)
+		if (await userMethods.validateUser(req.db_client, req.body.username, req.body.password)) {
+			k = await identMethods.getSession(req.db_client, req.body.username)
 		} else {
 			throw new Error('wrong user or password')
 		}
@@ -72,6 +78,10 @@ router.route('/register').post(async (req, res, next) => {
 		success: true,
 		api_token: k
 	})
+})
+
+router.route('/validate/').post(async (req, res, next) => {
+	
 })
 
 module.exports = router

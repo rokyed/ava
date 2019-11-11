@@ -1,4 +1,4 @@
-const auth = require('./base/auth/authMethods.js')
+const auth = require('./base/auth/initMethods.js')
 
 module.exports = async function init(client) {
 	try {
