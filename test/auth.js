@@ -163,14 +163,22 @@ module.exports = {
 			token
 		})
 		await this.userLogout(c, token)
-		console.log(i)
 		return
 	},
 
 	bashTest: async function (c, iterations) {
+		let promises = []
 		for (let i = 0; i < iterations; i++) {
 			let li = i + ''
-			this.scenarioUserRegister(c, li)
+			promises.push(this.scenarioUserRegister(c, li))
 		}
+
+		Promise.all(promises).then(async () => {
+			for (let i = 0; i < iterations; i++) {
+				let li = i + ''
+				await this.scenarioUserLogin(c, li)
+			}
+			process.exit(0)
+		})
 	},
 }
