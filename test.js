@@ -13,16 +13,20 @@ const config = {
 async function test() {
 	let pool = new Pool()
 	let client = await pool.connect()
+	console.log('Tests started:')
+	await dbinit(client)
+	console.log('DB init done.')
+	
 	try {
-		await dbinit(client)
-		console.log('initialization of database done!!')
 		await auth.test(config)
-		console.log('testing done')
 	} catch (e) {
-		console.error(e.message)
+		console.warn(e)
+		console.error('FAILED')
+	} finally {
+		console.log('Done!')
+		process.exit(0)
 	}
 
-	process.exit(0)
 }
 
 if (! (+TEST)) {

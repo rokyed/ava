@@ -22,7 +22,7 @@ router.route('/login').post(async (req, res, next) => {
 
 	res.json({
 		success: true,
-		api_token: token
+		token
 	})
 })
 
@@ -40,17 +40,17 @@ router.route('/logout').post(async (req, res, next) => {
 
 router.route('/register').post(async (req, res, next) => {
 	if (!req.body.userinfo)
-		return next(new Error('missing userinfo'))
+		return next(new Error('Missing userinfo'))
 
 	let k = null
 	let userinfoCheck = userMethods.checkInputUserInfo(req.body.userinfo)
 
 	if (userinfoCheck !== true) {
-		return next(new Error('missing fields: '+userinfoCheck.join(' ')))
+		return next(new Error('Missing fields: '+userinfoCheck.join(' ')))
 	}
 
 	if (req.body.password != req.body.password_repeat) {
-		return next(new Error('password not matching'))
+		return next(new Error('Password not matching'))
 	}
 
 	if (!emailValidator.validate(req.body.userinfo.email))
@@ -58,7 +58,7 @@ router.route('/register').post(async (req, res, next) => {
 
 	try {
 		if (await userMethods.checkUsernameExists(req.db_client, req.body.username))
-			throw new Error('user exits already')
+			throw new Error('User exists already')
 
 		await userMethods.createUser(req.db_client, req.body.username, req.body.password)
 		await userMethods.createUserInfo(req.db_client, req.body.username, req.body.userinfo)
@@ -68,7 +68,7 @@ router.route('/register').post(async (req, res, next) => {
 		if (await userMethods.validateUser(req.db_client, req.body.username, req.body.password)) {
 			k = await identMethods.getSession(req.db_client, req.body.username)
 		} else {
-			throw new Error('wrong user or password')
+			throw new Error('Wrong user or password')
 		}
 	} catch (e) {
 		return next(e)
@@ -76,12 +76,33 @@ router.route('/register').post(async (req, res, next) => {
 
 	res.json({
 		success: true,
-		api_token: k
+		token: k
 	})
 })
 
-router.route('/validate/').post(async (req, res, next) => {
-	
+router.route('/test').post(async (req, res, next) => {
+	let val = await identMethods.validateSession(req.db_client, req.body.token)
+	let role = await roleMethods.getRole(req.db_client, val)
+	console.log(val, role)
 })
+async function checkSession(req, res, next) {
+	let username = await identMethods.validateSession(req.db_client, req.body.token)
+	if (!username)
+		throw new Error('Not connected')
 
-module.exports = router
+	let role = await roleMethods.getRole(req.db_client, username)
+	let userinfo = await userMethods.getUserInfo(req.db_client, username)
+
+	req.user_session = {
+		username,
+		role,
+		userinfo
+	}
+
+	next()
+}
+
+module.exports = {
+	checkSession,
+	router
+}

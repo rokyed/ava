@@ -8,9 +8,9 @@ module.exports = {
 		req.db_client = client
 		res.on('finish', () => {
 			req.db_client.release()
-			console.log('DB >> connection released with `finish` event')
+			console.log('DB: Connection released with `finish` event')
 		})
-		console.log('DB >> connection created')
+		console.log('DB: Connection created')
 		next()
 	}
 }

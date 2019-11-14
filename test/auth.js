@@ -26,12 +26,11 @@ module.exports = {
 	changed,
 	userLogin: async (c) => {
 		let res = await axios.post(`${c.host}/auth/login`, ident)
-
-		return res.data.api_token
+		console.log(res.status, res.data)
+		return res.data.token
 	},
 
 	userRegister: async (c) => {
-		console.log('registering')
 		let regUsr = {
 			userinfo: {}
 		}
@@ -45,45 +44,117 @@ module.exports = {
 
 		regUsr.password_repeat = regUsr.password
 		let res = await axios.post(`${c.host}/auth/register`, regUsr)
-
-		return res.data.api_token
+		console.log(res.status, res.data)
+		return res.data.token
 	},
 
 	userLogout: async (c, token) => {
-		console.log('logging out')
 		let res = await axios.post(`${c.host}/auth/logout`, {
 			token
 		})
+		console.log(res.status, res.data)
 	},
 
-	getUserInfo: async (c) => {
-		console.log('getting user info')
+	getUserInfo: async (c, token) => {
 		let res = await axios.get(`${c.host}/auth/userinfo`, {
 			token
 		})
+
+		console.log(res.status, res.data)
+		return res.data.user_info
 	},
 
-	setUserInfo: async (c) => {
-		console.log('setting user info')
+	updateUserInfo: async (c, token) => {
 		let reqObj = {
-			token
+			token,
+			update: {}
 		}
 		for (let k in this.changed) {
-			reqObj[k] = this.changed[k]
+			reqObj.update[k] = this.changed[k]
 		}
 
 		let res = await axios.post(`${c.host}/auth/userinfo`, reqObj)
+		console.log(res.status, res.data)
+	},
+
+	scenarioUserRegister: async function(c) {
+		console.log('Scenario: User Register')
+
+		let token = await this.userRegister(c)
+		if (!token)
+			console.error('FAILED')
+		else
+			console.log('current token: ', token)
+
+		await this.userLogout(c, token)
+
+		return true
+	},
+
+	scenarioUserLogin: async function(c) {
+		console.log('Scenario: User Login')
+
+		let token = await this.userLogin(c)
+		if (!token)
+			console.error('FAILED')
+		else
+			console.log('current token: ', token)
+
+		await this.userLogout(c, token)
+
+		return true
+	},
+
+	scenarioUserGetsUserInfo: async function(c) {
+		console.log('Scenario: User Gets User Info')
+
+		let token = await this.userLogin(c)
+
+		let userInfo = await this.getUserInfo(c, token)
+		if (!userInfo)
+			console.error('FAILED')
+		else
+			console.log(userInfo)
+
+		await this.userLogout(c, token)
+
+		return true
+	},
+
+	scenarioUserChangesUserInfo: async function(c) {
+		console.log('Scenario: User Changes User Info')
+
+		let token = await this.userLogin(c)
+
+		let userInfo = await this.getUserInfo(c, token)
+		if (!userInfo)
+			console.error('FAILED')
+		else
+			console.log(userInfo)
+
+		await this.updateUserInfo(c, token)
+
+		userInfo = await this.getUserInfo(c, token)
+		if (!userInfo)
+			console.error('FAILED')
+		else
+			console.log(userInfo)
+
+		await this.userLogout(c, token)
+
+		return true
 	},
 
 	test: async function(c) {
-		console.log('> testing registering <')
-		let token = await this.userRegister(c)
-		console.log('current token: ', token)
+		await this.scenarioUserRegister(c)
+		await this.scenarioUserLogin(c)
+		await this.scenarioUserGetsUserInfo(c)
+		await this.scenarioUserChangesUserInfo(c)
+		let token = await this.userLogin(c)
+		await axios.post(`${c.host}/private/test`, {
+			token
+		})
 		await this.userLogout(c, token)
-
-		console.log('> testing login <')
-		token = await this.userLogin(c)
-		console.log('current token: ', token)
-		await this.userLogout(c, token)
+		return
 	}
 }

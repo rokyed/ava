@@ -2,6 +2,9 @@ require('dotenv').config()
 const express = require('express')
 const bodyParser = require('body-parser')
 const dbMiddleware = require('./middlewares/db.js')
+const auth = require('./base/auth/router.js')
+const private = require('./private/router.js')
+const public = require('./public/router.js')
 var app = express()
 
 const {
@@ -18,7 +21,9 @@ app.use((req, res, next) => {
 	next()
 })
 
-app.use('/auth', require('./base/auth/authRouter.js'))
+app.use('/public', public.router)
+app.use('/auth', auth.router)
+app.use('/private',auth.checkSession, private.router)
 
 app.use((req, res, next) => {
   return res.status(200).json({
