@@ -24,13 +24,21 @@ module.exports = {
 	ident,
 	info,
 	changed,
-	userLogin: async (c) => {
-		let res = await axios.post(`${c.host}/auth/login`, ident)
+	userLogin: async (c,iteration = '') => {
+		let d = {
+			username: ident.username + iteration,
+			password: ident.password
+		}
+		let res = await axios.post(`${c.host}/auth/login`, d)
 		console.log(res.status, res.data)
 		return res.data.token
 	},
 
-	userRegister: async (c) => {
+	userRegister: async (c, iteration = '') => {
+		let d = {
+			username: ident.username + iteration,
+			password: ident.password
+		}
 		let regUsr = {
 			userinfo: {}
 		}
@@ -38,8 +46,8 @@ module.exports = {
 			regUsr.userinfo[k] = info[k]
 		}
 
-		for (let k in ident) {
-			regUsr[k] = ident[k]
+		for (let k in d) {
+			regUsr[k] = d[k]
 		}
 
 		regUsr.password_repeat = regUsr.password
@@ -77,10 +85,10 @@ module.exports = {
 		console.log(res.status, res.data)
 	},
 
-	scenarioUserRegister: async function(c) {
+	scenarioUserRegister: async function(c, i) {
 		console.log('Scenario: User Register')
 
-		let token = await this.userRegister(c)
+		let token = await this.userRegister(c, i)
 		if (!token)
 			console.error('FAILED')
 		else
@@ -91,10 +99,10 @@ module.exports = {
 		return true
 	},
 
-	scenarioUserLogin: async function(c) {
+	scenarioUserLogin: async function(c, i) {
 		console.log('Scenario: User Login')
 
-		let token = await this.userLogin(c)
+		let token = await this.userLogin(c, i)
 		if (!token)
 			console.error('FAILED')
 		else
@@ -105,10 +113,10 @@ module.exports = {
 		return true
 	},
 
-	scenarioUserGetsUserInfo: async function(c) {
+	scenarioUserGetsUserInfo: async function(c, i) {
 		console.log('Scenario: User Gets User Info')
 
-		let token = await this.userLogin(c)
+		let token = await this.userLogin(c, i)
 
 		let userInfo = await this.getUserInfo(c, token)
 		if (!userInfo)
@@ -121,10 +129,10 @@ module.exports = {
 		return true
 	},
 
-	scenarioUserChangesUserInfo: async function(c) {
+	scenarioUserChangesUserInfo: async function(c, i) {
 		console.log('Scenario: User Changes User Info')
 
-		let token = await this.userLogin(c)
+		let token = await this.userLogin(c, i)
 
 		let userInfo = await this.getUserInfo(c, token)
 		if (!userInfo)
@@ -155,6 +163,14 @@ module.exports = {
 			token
 		})
 		await this.userLogout(c, token)
+		console.log(i)
 		return
-	}
+	},
+
+	bashTest: async function (c, iterations) {
+		for (let i = 0; i < iterations; i++) {
+			let li = i + ''
+			this.scenarioUserRegister(c, li)
+		}
+	},
 }
