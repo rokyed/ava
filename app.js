@@ -26,7 +26,7 @@ app.use('/auth', auth.router)
 app.use('/private',auth.checkSession, private.router)
 
 app.use((req, res, next) => {
-  return res.status(200).json({
+  return res.status(500).json({
 	success: false,
 	error: `Route ${req.url} not found.`
   });

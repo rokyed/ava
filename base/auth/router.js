@@ -80,26 +80,61 @@ router.route('/register').post(async (req, res, next) => {
 	})
 })
 
-router.route('/test').post(async (req, res, next) => {
-	let val = await identMethods.validateSession(req.db_client, req.body.token)
-	let role = await roleMethods.getRole(req.db_client, val)
-	console.log(val, role)
-})
-async function checkSession(req, res, next) {
+router.route('/test').post(checkSession, async (req, res, next) => {
 	let username = await identMethods.validateSession(req.db_client, req.body.token)
-	if (!username)
-		throw new Error('Not connected')
-
 	let role = await roleMethods.getRole(req.db_client, username)
-	let userinfo = await userMethods.getUserInfo(req.db_client, username)
 
-	req.user_session = {
-		username,
-		role,
-		userinfo
+	res.json({
+		success: true,
+		role
+	})
+})
+
+router.route('/get/userinfo').post(checkSession, async (req, res, next) => {
+	res.json({
+		success: true,
+		userinfo: req.user_session.userinfo
+	})
+})
+router.route('/set/userinfo').post(checkSession, async (req, res, next) => {
+	let username = req.user_session.username
+	let info = req.user_session.userinfo
+	let newInfo = req.body.userinfo
+
+	for (let k in newInfo) {
+		info[k] = newInfo[k]
 	}
 
-	next()
+	await userMethods.updateUserInfo(req.db_client, username, info)
+	console.log(req.user_session)
+	let newUserInfo = await userMethods.getUserInfo(req.db_client, username)
+	res.json({
+		success: true,
+		userinfo: newUserInfo
+	})
+})
+
+
+async function checkSession(req, res, next) {
+	try {
+		let username = await identMethods.validateSession(req.db_client, req.body.token)
+
+		if (!username)
+			throw new Error('Not Connected')
+
+		let role = await roleMethods.getRole(req.db_client, username)
+		let userinfo = await userMethods.getUserInfo(req.db_client, username)
+
+		req.user_session = {
+			username,
+			role,
+			userinfo
+		}
+
+		next()
+	} catch (e) {
+		next(e)
+	}
 }
 
 module.exports = {

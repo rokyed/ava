@@ -56,6 +56,14 @@ module.exports = {
 		return res.rows[0]
 	},
 
+	updateUserInfo: async function (client, username, infoObj) {
+		console.log('userMethods:updateUserInfo')
+
+		await client.query('UPDATE userinfo SET first_name = $2, last_name = $3, address = $4, city = $5, state = $6, zip_code = $7, country = $8, email = $9 WHERE username = $1', [username, infoObj.first_name, infoObj.last_name, infoObj.address, infoObj.city, infoObj.state, infoObj.zip_code, infoObj.country, infoObj.email])
+
+		return true
+	},
+
 	createUserInfo: async function (client, username, infoObj) {
 		console.log('userMethods:createUserInfo')
 
@@ -66,7 +74,7 @@ module.exports = {
 
 	checkInputUserInfo: function(userinfo) {
 		console.log('userMethods:checkInputUserInfo')
-		
+
 		let success = true
 		let items = ['first_name', 'last_name', 'address', 'city', 'state', 'zip_code', 'country', 'email']
 		let missing = []

@@ -14,7 +14,7 @@ module.exports = {
 	validateSession: async function (client, ident) {
 		console.log('identMethods:validateSession')
 
-		let res = await client.query('SELECT username from ident  WHERE session = $1', [ident])
+		let res = await client.query('SELECT username from ident WHERE session = $1', [ident])
 
 		if (res.rows[0])
 			return res.rows[0].username
@@ -22,9 +22,13 @@ module.exports = {
 		return false
 	},
 
+	updateSession: async function (client, ident) {
+		await client.query('UPDATE ident SET last_updated = now() WHERE session = $1', [ident])
+	},
+
 	deleteSession: async function (client, session) {
 		console.log('identMethods:deleteSession')
-		
+
 		await client.query('DELETE FROM ident where session = $1', [session])
 	},
 
