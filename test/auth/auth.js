@@ -7,6 +7,8 @@ module.exports = {
 		await authScenarios.userChangesUserInfo(c)
 		await authScenarios.userTriesToDoActionWithLogin(c)
 		await authScenarios.userTriesToDoActionWithoutLogin(c)
+		await authScenarios.userChangesPassword(c)
+		await authScenarios.loginWrongUsernameOrPassword(c)
 	},
 
 	bashTest: async function (c, iterations) {

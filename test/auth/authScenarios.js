@@ -2,6 +2,18 @@ const axios = require('axios')
 const authMethods = require('./authMethods.js')
 
 module.exports = {
+	loginWrongUsernameOrPassword: async function (c, i) {
+		console.log('Scenario: Client tries to login with wrong username or password')
+		try {
+			await authMethods.userLoginWithoutProperInfo(c)
+
+		} catch (e) {
+			console.error(e.message)
+		}
+		console.log('')
+
+		return true
+	},
 	userRegister: async function(c, i) {
 		console.log('Scenario: User Register')
 		try {
@@ -20,7 +32,7 @@ module.exports = {
 	},
 
 	userLogin: async function(c, i) {
-		console.log('Scenario: User Login')
+		console.log('Scenario: User login')
 		try {
 			let token = await authMethods.userLogin(c, i)
 			if (!token)
@@ -36,7 +48,7 @@ module.exports = {
 	},
 
 	userGetsUserInfo: async function(c, i) {
-		console.log('Scenario: User Gets User Info')
+		console.log('Scenario: User gets user nfo')
 		try {
 			let token = await authMethods.userLogin(c, i)
 
@@ -53,8 +65,26 @@ module.exports = {
 		return true
 	},
 
+	userChangesPassword: async function (c, i) {
+		console.log('Scenario: User changes password')
+		try {
+			let token = await authMethods.userLogin(c, i)
+
+			await authMethods.changePassword(c, token)
+			await authMethods.userLogout(c, token)
+			token = await authMethods.userLoginWithNewPassword(c, i)
+			if (!token)
+				console.error('FAILED')
+			await authMethods.userLogout(c, token)
+		} catch (e) {
+			console.error(e.message)
+		}
+		console.log('')
+		return true
+	},
+
 	userChangesUserInfo: async function(c, i) {
-		console.log('Scenario: User Changes User Info')
+		console.log('Scenario: User changes user info')
 		try {
 			let token = await authMethods.userLogin(c, i)
 
@@ -69,7 +99,7 @@ module.exports = {
 			userInfo = await authMethods.getUserInfo(c, token)
 			if (!userInfo)
 				console.error('FAILED')
-			
+
 
 			await authMethods.userLogout(c, token)
 		} catch (e) {

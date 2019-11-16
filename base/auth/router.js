@@ -49,12 +49,12 @@ router.route('/register').post(async (req, res, next) => {
 		return next(new Error('Missing fields: '+userinfoCheck.join(' ')))
 	}
 
-	if (req.body.password != req.body.password_repeat) {
-		return next(new Error('Password not matching'))
+	if (!userMethods.checkPassword(req.body.password, req.body.password_repeat)) {
+		return next(new Error('Password missing or not matching'))
 	}
 
 	if (!emailValidator.validate(req.body.userinfo.email))
-		return next(new Error('email incorrect'))
+		return next(new Error('Email incorrect'))
 
 	try {
 		if (await userMethods.checkUsernameExists(req.db_client, req.body.username))
@@ -90,6 +90,28 @@ router.route('/test').post(checkSession, async (req, res, next) => {
 	})
 })
 
+router.route('/set/password').post(checkSession, async (req,res, next) => {
+	if (!req.body.old_password)
+		return next(new Error('Old password missing'))
+		
+	if (!userMethods.checkPassword(req.body.password, req.body.password_repeat))
+		return next(new Error('Password missing or not matching'))
+
+	try {
+		if (await userMethods.validateUser(req.db_client, req.user_session.username, req.body.old_password)) {
+			await userMethods.changePassword(req.db_client, req.user_session.username, req.body.password)
+		} else {
+			throw new Error('Old password is wrong')
+		}
+	} catch (e) {
+		next (e)
+	}
+
+	res.json({
+		success: true
+	})
+})
+
 router.route('/get/userinfo').post(checkSession, async (req, res, next) => {
 	res.json({
 		success: true,
@@ -100,14 +122,20 @@ router.route('/set/userinfo').post(checkSession, async (req, res, next) => {
 	let username = req.user_session.username
 	let info = req.user_session.userinfo
 	let newInfo = req.body.userinfo
+	let newUserInfo = null
 
 	for (let k in newInfo) {
 		info[k] = newInfo[k]
 	}
 
-	await userMethods.updateUserInfo(req.db_client, username, info)
-	console.log(req.user_session)
-	let newUserInfo = await userMethods.getUserInfo(req.db_client, username)
+	try {
+		await userMethods.updateUserInfo(req.db_client, username, info)
+		newUserInfo = await userMethods.getUserInfo(req.db_client, username)
+
+	} catch (e) {
+		next(e)
+	}
+
 	res.json({
 		success: true,
 		userinfo: newUserInfo

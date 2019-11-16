@@ -1,7 +1,7 @@
 require('dotenv').config()
 const { Pool } = require('pg')
 const dbinit = require('./dbinit.js')
-const auth = require('./test/auth.js')
+const auth = require('./test/auth/auth.js')
 const {
 	APP_PORT = 15000,
 	TEST = 0,

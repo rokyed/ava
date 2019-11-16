@@ -1,9 +1,9 @@
 const utils = require('../../utils.js')
 
 module.exports = {
-	changePassword: async function (client, username, newPassword) {
+	changePassword: async function (client, username, password) {
 		console.log('userMethods:changePassword')
-
+		await client.query('UPDATE users SET password = $2 WHERE username = $1', [username, utils.encryptedPassword(password)])
 	},
 
 	changePasswordWithEmailToken: async function (client, username, emailToken, newPassword) {
@@ -70,6 +70,16 @@ module.exports = {
 		await client.query('INSERT INTO userinfo (username, first_name, last_name, address, city, state, zip_code, country, email) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)', [username, infoObj.first_name, infoObj.last_name, infoObj.address, infoObj.city, infoObj.state, infoObj.zip_code, infoObj.country, infoObj.email])
 
 		return true
+	},
+
+	checkPassword: function(pwd, pwdRep) {
+		if (!pwd)
+			return false
+
+		if (!pwdRep)
+			return false
+
+		return pwd === pwdRep
 	},
 
 	checkInputUserInfo: function(userinfo) {

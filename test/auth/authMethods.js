@@ -18,15 +18,37 @@ const changed = {
 	first_name: 'c',
 	last_name: 'd'
 }
+const newIdent = {
+	password: 'test2'
+}
 
 module.exports = {
 	ident,
 	info,
 	changed,
+	userLoginWithoutProperInfo: async (c) => {
+		let d = {
+			username: 'qwertyqwerty',
+			password: 'qwertyqwerty'
+		}
+		let res = await axios.post(`${c.host}/auth/login`, d)
+		console.log('User Login Without Proper Info: ', res.status, res.data)
+		return res.data.token
+	},
 	userLogin: async (c,iteration = '') => {
 		let d = {
 			username: ident.username + iteration,
 			password: ident.password
+		}
+		let res = await axios.post(`${c.host}/auth/login`, d)
+		console.log('User Login: ', res.status, res.data)
+		return res.data.token
+	},
+
+	userLoginWithNewPassword: async (c, iteration = '') => {
+		let d = {
+			username: ident.username + iteration,
+			password: newIdent.password
 		}
 		let res = await axios.post(`${c.host}/auth/login`, d)
 		console.log('User Login: ', res.status, res.data)
@@ -69,6 +91,16 @@ module.exports = {
 
 		console.log('Get User Info: ', res.status, res.data)
 		return res.data.userinfo
+	},
+
+	changePassword: async (c, token) => {
+		let res = await axios.post(`${c.host}/auth/set/password`, {
+			token,
+			password: newIdent.password,
+			password_repeat: newIdent.password,
+			old_password: ident.password
+		})
+		console.log('Change Password: ', res.status, res.data)
 	},
 
 	updateUserInfo: async (c, token) => {
