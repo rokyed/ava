@@ -5,6 +5,7 @@ const userMethods = require('./userMethods.js')
 const identMethods = require('./identMethods.js')
 const roleMethods = require('./roleMethods.js')
 const emailTokenMethods = require('./emailTokenMethods.js')
+const sessionMethods = require('./sessionMethods.js')
 
 router.route('/login').post(async (req, res, next) => {
 	let token = null
@@ -58,7 +59,10 @@ router.route('/register').post(async (req, res, next) => {
 
 	try {
 		if (await userMethods.checkUsernameExists(req.db_client, req.body.username))
-			throw new Error('User exists already')
+			throw new Error('User already exists')
+
+		if (await userMethods.getUserInfoByEmail(req.db_client, req.body.userinfo.email))
+			throw new Error('Email already exists')
 
 		await userMethods.createUser(req.db_client, req.body.username, req.body.password)
 		await userMethods.createUserInfo(req.db_client, req.body.username, req.body.userinfo)
@@ -93,7 +97,7 @@ router.route('/test').post(checkSession, async (req, res, next) => {
 router.route('/set/password').post(checkSession, async (req,res, next) => {
 	if (!req.body.old_password)
 		return next(new Error('Old password missing'))
-		
+
 	if (!userMethods.checkPassword(req.body.password, req.body.password_repeat))
 		return next(new Error('Password missing or not matching'))
 
@@ -112,13 +116,14 @@ router.route('/set/password').post(checkSession, async (req,res, next) => {
 	})
 })
 
-router.route('/get/userinfo').post(checkSession, async (req, res, next) => {
+router.route('/get/userinfo').post(sessionMethods.check, async (req, res, next) => {
 	res.json({
 		success: true,
 		userinfo: req.user_session.userinfo
 	})
 })
-router.route('/set/userinfo').post(checkSession, async (req, res, next) => {
+
+router.route('/set/userinfo').post(sessionMethods.check, async (req, res, next) => {
 	let username = req.user_session.username
 	let info = req.user_session.userinfo
 	let newInfo = req.body.userinfo
@@ -129,6 +134,11 @@ router.route('/set/userinfo').post(checkSession, async (req, res, next) => {
 	}
 
 	try {
+		let userinfoByEmail = await userMethods.getUserInfoByEmail(req.db_client, info.email)
+
+		if (userinfoByEmail && userinfoByEmail.username != username)
+			throw new Error('Email already used')
+
 		await userMethods.updateUserInfo(req.db_client, username, info)
 		newUserInfo = await userMethods.getUserInfo(req.db_client, username)
 
@@ -142,30 +152,47 @@ router.route('/set/userinfo').post(checkSession, async (req, res, next) => {
 	})
 })
 
+router.route('/reset/password').post(async (req, res, next) => {
+	let emailToken = req.body.email_token
 
-async function checkSession(req, res, next) {
+	if (!email_token)
+		return next(new Error('Token is missing'))
+
+	if (!userMethods.checkPassword(req.body.password, req.body.password_repeat))
+		return next(new Error('Password missing or not matching'))
+
+	let tokenData = await emailTokenMethods.getTokenData(req.db_client, emailToken)
+
+	if (!tokenData || tokenData.action != 'passwordReset')
+		return next(new Error('Wrong token'))
+
 	try {
-		let username = await identMethods.validateSession(req.db_client, req.body.token)
-
-		if (!username)
-			throw new Error('Not Connected')
-
-		let role = await roleMethods.getRole(req.db_client, username)
-		let userinfo = await userMethods.getUserInfo(req.db_client, username)
-
-		req.user_session = {
-			username,
-			role,
-			userinfo
-		}
-
-		next()
+		await userMethods.changePassword(req.db_client, tokenData.username, req.body.password)
+		await emailTokenMethods.deleteToken(req.db_client, emailToken)
 	} catch (e) {
-		next(e)
+		return next(new Error('Something went wrong'))
 	}
-}
+
+	res.json({
+		success: true
+	})
+})
+
+router.route('/request/reset/password').post(async (req, res, next) => {
+	let username = req.body.username
+	let email = req.body.email
+
+	if (!username && !email)
+		return next(new Error('No info provided'))
+
+	if (username) {
+
+	} else {
+
+	}
+})
+
 
 module.exports = {
-	checkSession,
 	router
 }

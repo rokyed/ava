@@ -3,6 +3,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const dbMiddleware = require('./middlewares/db.js')
 const auth = require('./base/auth/router.js')
+const sessionMethods = require('./base/auth/sessionMethods.js')
 const private = require('./private/router.js')
 const public = require('./public/router.js')
 var app = express()
@@ -23,7 +24,7 @@ app.use((req, res, next) => {
 
 app.use('/public', public.router)
 app.use('/auth', auth.router)
-app.use('/private',auth.checkSession, private.router)
+app.use('/private',sessionMethods.check, private.router)
 
 app.use((req, res, next) => {
   return res.status(500).json({

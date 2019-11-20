@@ -27,7 +27,7 @@ module.exports = {
 			client = await POOL.connect()
 			console.log('DB: Connection created')
 		} catch (e) {
-			throw new Error('DB: Failed to connect to databse')
+			next(new Error('DB: Failed to connect to databse'))
 		}
 
 		if (client) {
