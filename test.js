@@ -1,4 +1,5 @@
 require('dotenv').config()
+const colors = require('colors')
 const { Pool } = require('pg')
 const dbinit = require('./dbinit.js')
 const auth = require('./test/auth/auth.js')
@@ -20,17 +21,17 @@ async function test() {
 	console.log('Tests started:')
 	await dbinit(client)
 	console.log('DB init done.')
+	console.log('')
 
 	try {
 		await auth.test(config)
 	} catch (e) {
 		console.warn(e)
-		console.error('FAILED')
+		console.error(colors.red('FAILED'))
 	} finally {
-		console.log('Done!')
+		console.log(colors.green('Done!'))
 		process.exit(0)
 	}
-
 }
 
 async function bashTest() {
@@ -39,14 +40,15 @@ async function bashTest() {
 	console.log('Tests started:')
 	await dbinit(client)
 	console.log('DB init done.')
+	console.log('')
 
 	try {
 		await auth.bashTest(config, 100)
 	} catch (e) {
 		console.warn(e)
-		console.error('FAILED')
+		console.error(colors.red('FAILED'))
 	} finally {
-		console.log('Done!')
+		console.log(colors.green('Done!'))
 	}
 }
 

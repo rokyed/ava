@@ -7,6 +7,7 @@ npm i
 
 #then
 node init.js #initializes the database (can only be run if TEST=1)
+node generateTemplates.js #generates all the templates
 node app.js #runs the server instance
 
 #for testing

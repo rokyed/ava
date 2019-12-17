@@ -16,7 +16,8 @@ const info = {
 }
 const changed = {
 	first_name: 'c',
-	last_name: 'd'
+	last_name: 'd',
+	language: 'fr'
 }
 const newIdent = {
 	password: 'test2'

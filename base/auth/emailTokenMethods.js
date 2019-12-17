@@ -1,8 +1,18 @@
 const utils = require('../../utils.js')
+const template = require('../../modules/template.js')
+// const nodemailer = require('../../modules/nodemailer.js')
 
 module.exports = {
-	generateEmailValidateToken: async function(client, username) {
+	generateEmailValidation: async function(client, username, userinfo) {
 		//@TODO implement validate user email
+		// what  we need: generate email token and send an email to let user know to activate his account
+		let emailTpl = template.genTpl('email', 'verifyEmail', userinfo.language, userinfo)
+		console.log(emailTpl)
+		return true
+	},
+
+	generateEmailPasswordReset: async function(client, username, userinfo) {
+
 		return true
 	},
 

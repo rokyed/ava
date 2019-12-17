@@ -1,0 +1,4 @@
+{
+	"userinfo": ["first_name", "last_name", "address", "city", "state", "zip_code", "country", "email", "phone_number", "language"],
+	"language": ["en", "fr"]
+}

@@ -1,13 +1,15 @@
+const colors = require('colors')
+
 function format (testName, pass, err) {
 		let pString = ''
-
+		let dash = colors.blue('--->')
 		if (pass === undefined) {
-			pString = 'NOCONC' // not concluded
+			pString = colors.red('NOCONC') // not concluded
 		} else {
-			pString = pass ? 'PASSED': 'FAILED'
+			pString = pass ? colors.green('PASSED'): colors.red('FAILED')
 		}
 
-		console.log(`${pString} <<>> ${testName}`)
+		console.log(`${pString} ${dash} ${testName}`)
 
 		if (!pass)
 			console.error(err)
@@ -16,7 +18,9 @@ function format (testName, pass, err) {
 }
 
 function scenario (name, pass, err) {
-	return format(`Scenario: ${name}`, pass, err)
+	let scenario = colors.magenta('Scenario')
+	let cols = colors.grey(':')
+	return format(`${scenario}${cols} ${name}`, pass, err)
 }
 
 function legend () {

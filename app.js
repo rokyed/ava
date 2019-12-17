@@ -15,13 +15,14 @@ const {
 } = process.env
 
 app.use(bodyParser.json())
-app.use(dbMiddleware.dbConnect)
 app.use((req, res, next) => {
 	utils.log('.......................................................................')
 	utils.log(req.path)
 	utils.log('.......................................................................')
 	next()
 })
+app.use(dbMiddleware.dbConnect)
+
 
 app.use('/public', public.router)
 app.use('/auth', auth.router)

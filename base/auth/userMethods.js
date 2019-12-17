@@ -1,4 +1,7 @@
 const utils = require('../../utils.js')
+const defaultValues = require('../../defaultValues.json')
+const filter = require('../../filter.json')
+
 
 module.exports = {
 	changePassword: async function (client, username, password) {
@@ -70,7 +73,7 @@ module.exports = {
 	updateUserInfo: async function (client, username, infoObj) {
 		utils.log('userMethods:updateUserInfo')
 
-		await client.query('UPDATE userinfo SET first_name = $2, last_name = $3, address = $4, city = $5, state = $6, zip_code = $7, country = $8, email = $9, phone_number = $10 WHERE username = $1', [username, infoObj.first_name, infoObj.last_name, infoObj.address, infoObj.city, infoObj.state, infoObj.zip_code, infoObj.country, infoObj.email, infoObj.phone_number])
+		await client.query('UPDATE userinfo SET first_name = $2, last_name = $3, address = $4, city = $5, state = $6, zip_code = $7, country = $8, email = $9, phone_number = $10, language = $11 WHERE username = $1', [username, infoObj.first_name, infoObj.last_name, infoObj.address, infoObj.city, infoObj.state, infoObj.zip_code, infoObj.country, infoObj.email, infoObj.phone_number, infoObj.language])
 
 		return true
 	},
@@ -78,7 +81,7 @@ module.exports = {
 	createUserInfo: async function (client, username, infoObj) {
 		utils.log('userMethods:createUserInfo')
 
-		await client.query('INSERT INTO userinfo (username, first_name, last_name, address, city, state, zip_code, country, email, phone_number) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)', [username, infoObj.first_name, infoObj.last_name, infoObj.address, infoObj.city, infoObj.state, infoObj.zip_code, infoObj.country, infoObj.email, infoObj.phone_number])
+		await client.query('INSERT INTO userinfo (username, first_name, last_name, address, city, state, zip_code, country, email, phone_number, language) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)', [username, infoObj.first_name, infoObj.last_name, infoObj.address, infoObj.city, infoObj.state, infoObj.zip_code, infoObj.country, infoObj.email, infoObj.phone_number, infoObj.language])
 
 		return true
 	},
@@ -97,7 +100,7 @@ module.exports = {
 		utils.log('userMethods:checkInputUserInfo')
 
 		let success = true
-		let items = ['first_name', 'last_name', 'address', 'city', 'state', 'zip_code', 'country', 'email', 'phone_number']
+		let items = filter.userinfo
 		let missing = []
 
 		for (let k = 0; k < items.length; k++) {
@@ -112,5 +115,21 @@ module.exports = {
 		}
 
 		return success
+	},
+
+	checkLanguage: function(language) {
+		return filter.language.indexOf(language) > -1
+	},
+
+	autocompleteDefault: function(userinfo) {
+
+		if (defaultValues.userinfo) {
+				for (let k in defaultValues.userinfo) {
+					if (!userinfo[k])
+						userinfo[k] = defaultValues.userinfo[k]
+				}
+		}
+
+		return userinfo
 	}
 }

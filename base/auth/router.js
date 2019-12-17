@@ -43,10 +43,13 @@ router.route('/register').post(async (req, res, next) => {
 	if (!req.body.userinfo)
 		return next(new Error('Missing userinfo'))
 
-	let k = null
-	let userinfoCheck = userMethods.checkInputUserInfo(req.body.userinfo)
+	let userinfo = userMethods.autocompleteDefault(req.body.userinfo)
+	let token = null
 
-	if (userinfoCheck !== true) {
+	if (!userMethods.checkLanguage(userinfo.language))
+		return next(new Error('Wrong language selected'))
+
+	if (userMethods.checkInputUserInfo(userinfo) !== true) {
 		return next(new Error('Missing fields: '+userinfoCheck.join(' ')))
 	}
 
@@ -54,33 +57,34 @@ router.route('/register').post(async (req, res, next) => {
 		return next(new Error('Password missing or not matching'))
 	}
 
-	if (!emailValidator.validate(req.body.userinfo.email))
+	if (!emailValidator.validate(userinfo.email))
 		return next(new Error('Email incorrect'))
 
 	try {
 		if (await userMethods.checkUsernameExists(req.db_client, req.body.username))
 			throw new Error('User already exists')
 
-		if (await userMethods.getUserInfoByEmail(req.db_client, req.body.userinfo.email))
+		if (await userMethods.getUserInfoByEmail(req.db_client, userinfo.email))
 			throw new Error('Email already exists')
 
 		await userMethods.createUser(req.db_client, req.body.username, req.body.password)
-		await userMethods.createUserInfo(req.db_client, req.body.username, req.body.userinfo)
+		await userMethods.createUserInfo(req.db_client, req.body.username, userinfo)
 		await roleMethods.createUserRole(req.db_client, req.body.username)
-		await emailTokenMethods.generateEmailValidateToken(req.db_client, req.body.username)
 
 		if (await userMethods.validateUser(req.db_client, req.body.username, req.body.password)) {
-			k = await identMethods.getSession(req.db_client, req.body.username)
+			token = await identMethods.getSession(req.db_client, req.body.username)
 		} else {
 			throw new Error('Wrong user or password')
 		}
+
+		await emailTokenMethods.generateEmailValidation(req.db_client, req.body.username, userinfo)
 	} catch (e) {
 		return next(e)
 	}
 
 	res.json({
 		success: true,
-		token: k
+		token
 	})
 })
 
@@ -132,6 +136,9 @@ router.route('/set/userinfo').post(sessionMethods.check, async (req, res, next) 
 	for (let k in newInfo) {
 		info[k] = newInfo[k]
 	}
+
+	if (!userMethods.checkLanguage(newInfo.language))
+		return next(new Error('Wrong language selected'))
 
 	try {
 		let userinfoByEmail = await userMethods.getUserInfoByEmail(req.db_client, info.email)
