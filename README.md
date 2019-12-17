@@ -16,14 +16,3 @@ node test.js #runs the automated tests (can only be run if TEST=1)
 #### WARNING:
 
 WARNING: DO NOT LET YOUR PRODUCTION HAVE **TEST=1** IN ENV VARS !!
-
-
-#### TODO:
-
-- automated tests
-- user info
-- user session
-- user validate session
-- user get role
-- forgot password generate email
-- change password with email token

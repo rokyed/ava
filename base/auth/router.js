@@ -84,7 +84,7 @@ router.route('/register').post(async (req, res, next) => {
 	})
 })
 
-router.route('/test').post(checkSession, async (req, res, next) => {
+router.route('/test').post(sessionMethods.check, async (req, res, next) => {
 	let username = await identMethods.validateSession(req.db_client, req.body.token)
 	let role = await roleMethods.getRole(req.db_client, username)
 
@@ -94,7 +94,7 @@ router.route('/test').post(checkSession, async (req, res, next) => {
 	})
 })
 
-router.route('/set/password').post(checkSession, async (req,res, next) => {
+router.route('/set/password').post(sessionMethods.check, async (req,res, next) => {
 	if (!req.body.old_password)
 		return next(new Error('Old password missing'))
 

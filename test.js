@@ -47,7 +47,7 @@ async function bashTest() {
 	}
 }
 
-if (! (+TEST)) {
+if (+TEST !== 1) {
 	console.log(`You can't run this in production setup. It will destroy your database!!`)
 	process.exit(0)
 } else {

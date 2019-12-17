@@ -14,13 +14,13 @@ module.exports = {
 	getUserInfoByEmail: async function(client, email) {
 		console.log('userMethods:checkEmailExists')
 
-		let res = await client.query('SELECT * from userinfo WHERE email = $1')
+		let res = await client.query('SELECT * from userinfo WHERE email = $1', [email])
 
 		if (res.rows[0])
 			return res.rows[0]
 
 		return false
-	}
+	},
 
 	checkUsernameExists: async function (client, username) {
 		console.log('userMethods:checkUsernameExists')
