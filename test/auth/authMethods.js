@@ -32,7 +32,7 @@ module.exports = {
 			password: 'qwertyqwerty'
 		}
 		let res = await axios.post(`${c.host}/auth/login`, d)
-		console.log('User Login Without Proper Info: ', res.status, res.data)
+		// console.log('User Login Without Proper Info: ', res.status, res.data)
 		return res.data.token
 	},
 	userLogin: async (c,iteration = '') => {
@@ -41,7 +41,7 @@ module.exports = {
 			password: ident.password
 		}
 		let res = await axios.post(`${c.host}/auth/login`, d)
-		console.log('User Login: ', res.status, res.data)
+		// console.log('User Login: ', res.status, res.data)
 		return res.data.token
 	},
 
@@ -51,7 +51,7 @@ module.exports = {
 			password: newIdent.password
 		}
 		let res = await axios.post(`${c.host}/auth/login`, d)
-		console.log('User Login: ', res.status, res.data)
+		// console.log('User Login: ', res.status, res.data)
 		return res.data.token
 	},
 
@@ -73,7 +73,7 @@ module.exports = {
 
 		regUsr.password_repeat = regUsr.password
 		let res = await axios.post(`${c.host}/auth/register`, regUsr)
-		console.log('User Register: ', res.status, res.data)
+		// console.log('User Register: ', res.status, res.data)
 		return res.data.token
 	},
 
@@ -81,7 +81,7 @@ module.exports = {
 		let res = await axios.post(`${c.host}/auth/logout`, {
 			token
 		})
-		console.log('User Logout: ', res.status, res.data)
+		// console.log('User Logout: ', res.status, res.data)
 	},
 
 	getUserInfo: async (c, token) => {
@@ -89,7 +89,7 @@ module.exports = {
 			token
 		})
 
-		console.log('Get User Info: ', res.status, res.data)
+		// console.log('Get User Info: ', res.status, res.data)
 		return res.data.userinfo
 	},
 
@@ -100,7 +100,7 @@ module.exports = {
 			password_repeat: newIdent.password,
 			old_password: ident.password
 		})
-		console.log('Change Password: ', res.status, res.data)
+		// console.log('Change Password: ', res.status, res.data)
 	},
 
 	updateUserInfo: async (c, token) => {
@@ -110,14 +110,14 @@ module.exports = {
 		}
 
 		let res = await axios.post(`${c.host}/auth/set/userinfo`, reqObj)
-		console.log('Update User Info: ', res.status, res.data)
+		// console.log('Update User Info: ', res.status, res.data)
 	},
 
 	accessPrivate: async (c, token) => {
 		let res = await axios.post(`${c.host}/private/test`, {
 			token
 		})
-		console.log('Access /private/test: ',res.status, res.data)
+		// console.log('Access /private/test: ',res.status, res.data)
 		return res.data
 	}
 }

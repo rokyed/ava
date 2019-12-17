@@ -1,22 +1,22 @@
 const {
 	POOL_SIZE = 1
 } = process.env
-
+const utils = require('../utils.js')
 const { Pool } = require('pg')
 const POOL = new Pool({
 	max: +POOL_SIZE
 })
 
 POOL.on('connect', (c) => {
-	console.log('DB: Client connected')
+	utils.log('DB: Client connected')
 })
 
 POOL.on('remove', (c) => {
-	console.log('DB: Client removed')
+	utils.log('DB: Client removed')
 })
 
 POOL.on('error', (e, c) => {
-	console.error(e)
+	utils.error(e)
 })
 
 module.exports = {
@@ -25,7 +25,7 @@ module.exports = {
 
 		try {
 			client = await POOL.connect()
-			console.log('DB: Connection created')
+			utils.log('DB: Connection created')
 		} catch (e) {
 			next(new Error('DB: Failed to connect to databse'))
 		}
@@ -34,7 +34,7 @@ module.exports = {
 			req.db_client = client
 			res.on('finish', () => {
 				req.db_client.release(true)
-				console.log('DB: Connection released with `finish` event')
+				utils.log('DB: Connection released with `finish` event')
 			})
 			next()
 		}

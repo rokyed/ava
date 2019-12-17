@@ -1,8 +1,13 @@
 const utils = require('../../utils.js')
 
 module.exports = {
+	generateEmailValidateToken: async function(client, username) {
+		//@TODO implement validate user email
+		return true
+	},
+
 	generateToken: async function(client, username, action) {
-		console.log('emailTokenMethods:generatePasswordResetToken')
+		utils.log('emailTokenMethods:generatePasswordResetToken')
 		let randKey = utils.genRandKey()
 
 		await client.query('INSERT INTO emailtoken (token, username, action) VALUES ($1, $2, $3)', [randKey, username, action])
@@ -11,7 +16,7 @@ module.exports = {
 	},
 
 	getTokenData: async function(client, token) {
-		console.log('emailTokenMethods:getTokenData')
+		utils.log('emailTokenMethods:getTokenData')
 
 		let res = await client.query('SELECT username, action FROM emailtoken WHERE token = $1', [token])
 
@@ -22,7 +27,7 @@ module.exports = {
 	},
 
 	deleteToken: async function(client, token) {
-		console.log('emailTokenMethods.deleteToken')
+		utils.log('emailTokenMethods.deleteToken')
 		await client.query('DELETE FROM emailtoken WHERE token = $1', [token])
 	}
 

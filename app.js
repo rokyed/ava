@@ -6,6 +6,7 @@ const auth = require('./base/auth/router.js')
 const sessionMethods = require('./base/auth/sessionMethods.js')
 const private = require('./private/router.js')
 const public = require('./public/router.js')
+const utils = require('./utils.js')
 var app = express()
 
 const {
@@ -16,9 +17,9 @@ const {
 app.use(bodyParser.json())
 app.use(dbMiddleware.dbConnect)
 app.use((req, res, next) => {
-	console.log('.......................................................................')
-	console.log(req.path)
-	console.log('.......................................................................')
+	utils.log('.......................................................................')
+	utils.log(req.path)
+	utils.log('.......................................................................')
 	next()
 })
 
@@ -34,7 +35,7 @@ app.use((req, res, next) => {
 })
 
 app.use(function(err, req, res, next) {
-	console.error(err)
+	utils.error(err)
 
 	if (TEST != 0) {
 		return res.status(500).json({

@@ -2,18 +2,21 @@ require('dotenv').config()
 const { Pool } = require('pg')
 const dbinit = require('./dbinit.js')
 const auth = require('./test/auth/auth.js')
+const testMethods = require('./test/methods.js')
 const {
 	APP_PORT = 15000,
 	TEST = 0,
 	BASH_TEST = 0
 } = process.env
 const config = {
-	host: `http://localhost:${APP_PORT}`
+	host: `http://localhost:${APP_PORT}`,
+	m: testMethods
 }
 
 async function test() {
 	let pool = new Pool()
 	let client = await pool.connect()
+	testMethods.legend()
 	console.log('Tests started:')
 	await dbinit(client)
 	console.log('DB init done.')

@@ -2,7 +2,7 @@ const utils = require('../../utils.js')
 
 module.exports = {
 	getSession: async function (client, username) {
-		console.log('identMethods:getSession')
+		utils.log('identMethods:getSession')
 
 		let k = utils.genRandKey()
 
@@ -12,7 +12,7 @@ module.exports = {
 	},
 
 	validateSession: async function (client, ident) {
-		console.log('identMethods:validateSession')
+		utils.log('identMethods:validateSession')
 
 		let res = await client.query('SELECT username from ident WHERE session = $1', [ident])
 
@@ -27,13 +27,13 @@ module.exports = {
 	},
 
 	deleteSession: async function (client, session) {
-		console.log('identMethods:deleteSession')
+		utils.log('identMethods:deleteSession')
 
 		await client.query('DELETE FROM ident where session = $1', [session])
 	},
 
 	deleteAllSessionsFor: async function (client, username) {
-		console.log('identMethods:deleteAllSessionsFor')
+		utils.log('identMethods:deleteAllSessionsFor')
 		await client.query('DELETE FROM ident where username = $1', [username])
 	},
 }
