@@ -50,7 +50,6 @@ const mergeBtoA = function(A, B) {
 			merged[k] = B[k]
 		}
 	}
-
 	return merged
 }
 
@@ -66,8 +65,9 @@ let templatesJSON = {}
 
 for (let i = 0; i < templates.length; i++) {
 	let templateURI = templates[i]
-	console.log(templateURI)
 	let content = getContentOf(templateURI)
-	templatesJSON = mergeBtoA(templatesJSON, putContentInJSONTree(templateURI.replace(templatesDir + '/', ''), content))
+	let tree = putContentInJSONTree(templateURI.replace(templatesDir + '/', ''), content)
+	templatesJSON = mergeBtoA(templatesJSON, tree)
 }
-fs.writeFileSync(path.join(__dirname, 'templates.json'), JSON.stringify(templatesJSON))
+
+fs.writeFileSync(path.join(__dirname, 'templates.json'), JSON.stringify(templatesJSON),{flag: 'w+'})

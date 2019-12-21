@@ -7,7 +7,8 @@ const testMethods = require('./test/methods.js')
 const {
 	APP_PORT = 15000,
 	TEST = 0,
-	BASH_TEST = 0
+	BASH_TEST = 0,
+	BASH_SIZE = 10
 } = process.env
 const config = {
 	host: `http://localhost:${APP_PORT}`,
@@ -43,7 +44,7 @@ async function bashTest() {
 	console.log('')
 
 	try {
-		await auth.bashTest(config, 100)
+		await auth.bashTest(config, BASH_SIZE)
 	} catch (e) {
 		console.warn(e)
 		console.error(colors.red('FAILED'))

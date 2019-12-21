@@ -70,6 +70,14 @@ module.exports = {
 		return res.rows[0]
 	},
 
+	getUserVerified: async function (client, username) {
+		utils.log('userMethods:getUserVerified')
+
+		let res = await client.query('SELECT verified from users WHERE username = $1', [username])
+
+		return res.rows[0].verified
+	},
+
 	updateUserInfo: async function (client, username, infoObj) {
 		utils.log('userMethods:updateUserInfo')
 

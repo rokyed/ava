@@ -6,13 +6,19 @@ module.exports = {
 	generateEmailValidation: async function(client, username, userinfo) {
 		//@TODO implement validate user email
 		// what  we need: generate email token and send an email to let user know to activate his account
-		let emailTpl = template.genTpl('email', 'verifyEmail', userinfo.language, userinfo)
+		let emailTpl = template.genTpl(userinfo.language, 'email', 'verifyEmail', {
+			token: await this.generateToken(client, username, 'verifyEmail'),
+			first_name: userinfo.first_name
+		})
 		console.log(emailTpl)
 		return true
 	},
 
 	generateEmailPasswordReset: async function(client, username, userinfo) {
-
+		let emailTpl = template.genTpl(userinfo.language, 'email', 'passwordReset', {
+			token: await this.generateToken(client, username, 'passwordReset'),
+			first_name: userinfo.first_name
+		})
 		return true
 	},
 

@@ -3,7 +3,7 @@ const authMethods = require('./authMethods.js')
 
 module.exports = {
 	loginWrongUsernameOrPassword: async function (c, i) {
-		let name = 'Client tries to login with wrong username or password'
+		let name = 'Client tries to login with wrong username or password ' + i
 		let pass
 		let err
 		try {
@@ -18,7 +18,7 @@ module.exports = {
 		return true
 	},
 	userRegister: async function(c, i) {
-		let name = 'User Register'
+		let name = 'User Register ' + i
 		let pass
 		let err
 		try {
@@ -39,7 +39,7 @@ module.exports = {
 	},
 
 	userLogin: async function(c, i) {
-		let name = 'User Login'
+		let name = 'User Login ' + i
 		let pass
 		let err
 		try {
@@ -61,7 +61,7 @@ module.exports = {
 	},
 
 	userGetsUserInfo: async function(c, i) {
-		let name = 'User gets user info'
+		let name = 'User gets user info ' + i
 		let pass
 		let err
 
@@ -88,7 +88,7 @@ module.exports = {
 	},
 
 	userChangesPassword: async function (c, i) {
-		let name = 'User changes password'
+		let name = 'User changes password ' + i
 		let pass
 		let err
 
@@ -118,7 +118,7 @@ module.exports = {
 	},
 
 	userChangesUserInfo: async function(c, i) {
-		let name = 'User changes user info'
+		let name = 'User changes user info ' + i
 		let pass
 		let err
 
@@ -134,8 +134,15 @@ module.exports = {
 				throw new Error('no user info')
 			else {
 				for (let k in authMethods.info) {
-					if (authMethods.info[k] != userInfo[k])
-						throw new Error('info is not exact')
+					if (k == 'email') {
+						let tplEmail = authMethods.info.email.replace('{{i}}', i || '')
+						if (tplEmail != userInfo[k])
+							throw new Error('info is not exact')
+					} else {
+						if (authMethods.info[k] != userInfo[k])
+							throw new Error('info is not exact')
+					}
+
 				}
 			}
 
@@ -165,7 +172,7 @@ module.exports = {
 	},
 
 	userTriesToDoActionWithLogin: async function (c, i) {
-		let name = 'User tries to do private action with login'
+		let name = 'User tries to do private action with login ' + i
 		let pass
 		let err
 		try {
@@ -186,8 +193,8 @@ module.exports = {
 		return true
 	},
 
-	userTriesToDoActionWithoutLogin: async function (c) {
-		let name = 'User tries to do private action wtihout login'
+	userTriesToDoActionWithoutLogin: async function (c, i) {
+		let name = 'User tries to do private action wtihout login ' + i
 		let pass
 		let err
 		try {

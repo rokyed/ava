@@ -11,8 +11,12 @@ function render(template, data) {
 	return rendered
 }
 
-function genTpl(kind, action, lang, data) {
-	return render(templates[kind][lang][action], data)
+function genTpl(lang, kind, action, data) {
+	try {
+		return render(templates[kind][lang][action], data)
+	} catch (e) {
+		throw e
+	}
 }
 
 module.exports = {

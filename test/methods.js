@@ -1,4 +1,8 @@
+require('dotenv').config()
 const colors = require('colors')
+const {
+	VERBOSE_TEST=0
+} = process.env
 
 function format (testName, pass, err) {
 		let pString = ''
@@ -11,10 +15,8 @@ function format (testName, pass, err) {
 
 		console.log(`${pString} ${dash} ${testName}`)
 
-		if (!pass)
+		if (!pass && +VERBOSE_TEST)
 			console.error(err)
-
-		console.log('')
 }
 
 function scenario (name, pass, err) {

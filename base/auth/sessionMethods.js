@@ -12,11 +12,13 @@ module.exports = {
 
 			let role = await roleMethods.getRole(req.db_client, username)
 			let userinfo = await userMethods.getUserInfo(req.db_client, username)
-
+			let verified = await userMethods.getUserVerified(req.db_client, username)
+			
 			req.user_session = {
 				username,
 				role,
-				userinfo
+				userinfo,
+				verified
 			}
 
 			next()

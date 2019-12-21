@@ -6,7 +6,7 @@ const ident = {
 const info = {
 	first_name: 'a',
 	last_name: 'b',
-	email: 'test@bob.com',
+	email: 'test{{i}}@bob.com',
 	address: '123 street',
 	city: 'city',
 	state: 'state',
@@ -68,6 +68,8 @@ module.exports = {
 			regUsr.userinfo[k] = info[k]
 		}
 
+		regUsr.userinfo.email = info.email.replace('{{i}}', iteration)
+
 		for (let k in d) {
 			regUsr[k] = d[k]
 		}
@@ -78,7 +80,7 @@ module.exports = {
 		return res.data.token
 	},
 
-	userLogout: async (c, token) => {
+	userLogout: async (c,  token) => {
 		let res = await axios.post(`${c.host}/auth/logout`, {
 			token
 		})

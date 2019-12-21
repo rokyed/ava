@@ -1,4 +1,9 @@
+require('dotenv').config()
 const authScenarios = require('./authScenarios.js')
+const {
+	TEST_WITH_ASYNC = 0
+} = process.env
+
 module.exports = {
 	test: async function(c) {
 		await authScenarios.userRegister(c)
@@ -12,18 +17,32 @@ module.exports = {
 	},
 
 	bashTest: async function (c, iterations) {
-		let promises = []
-		for (let i = 0; i < iterations; i++) {
-			let li = i + ''
-			promises.push(authScenarios.userRegister(c, li))
-		}
-
-		Promise.all(promises).then(async () => {
+		if (+TEST_WITH_ASYNC) {
 			for (let i = 0; i < iterations; i++) {
-				let li = i + ''
+				let li = (i + 1) + ''
+				await authScenarios.userRegister(c, li)
 				await authScenarios.userLogin(c, li)
+				await authScenarios.userGetsUserInfo(c, li)
+				await authScenarios.userChangesUserInfo(c, li)
+				await authScenarios.userTriesToDoActionWithLogin(c, li)
+				// await authScenarios.userTriesToDoActionWithoutLogin(c, li)
+				await authScenarios.userChangesPassword(c, li)
+				// await authScenarios.loginWrongUsernameOrPassword(c, li)
 			}
-			process.exit(0)
-		})
+		} else {
+			let promises = []
+			for (let i = 0; i < iterations; i++) {
+				let li = (i + 1) + ''
+				promises.push(authScenarios.userRegister(c, li))
+			}
+
+			Promise.all(promises).then(async () => {
+				for (let i = 0; i < iterations; i++) {
+					let li = (i + 1) + ''
+					authScenarios.userLogin(c, li)
+				}
+				process.exit(0)
+			})
+		}
 	}
 }
