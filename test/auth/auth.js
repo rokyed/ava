@@ -27,12 +27,10 @@ module.exports = {
 				let li = (i + 1) + ''
 				testAuth(c, li)
 			}
-			if (+VERBOSE_TEST) {
-				let d2 = (new Date()).getTime()
 
-				console.log(`The process took: ${(d2 - d) / 1000 } seconds`)
-			}
+			let d2 = (new Date()).getTime()
 
+			console.log(`The process took: ${(d2 - d) / 1000 } seconds`)
 		} else {
 			let promises = []
 			for (let i = 0; i < iterations; i++) {
@@ -41,11 +39,9 @@ module.exports = {
 			}
 
 			Promise.all(promises).then(async () => {
-				if (+VERBOSE_TEST) {
-					let d2 = (new Date()).getTime()
+				let d2 = (new Date()).getTime()
 
-					console.log(`The process took: ${(d2 - d) / 1000 } seconds`)
-				}
+				console.log(`The process took: ${(d2 - d) / 1000 } seconds`)
 				process.exit(0)
 			})
 		}
