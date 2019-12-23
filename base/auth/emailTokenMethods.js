@@ -10,7 +10,7 @@ module.exports = {
 			token: await this.generateToken(client, username, 'verifyEmail'),
 			first_name: userinfo.first_name
 		})
-		console.log(emailTpl)
+		utils.log(emailTpl)
 		return true
 	},
 

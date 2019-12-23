@@ -1,7 +1,8 @@
 require('dotenv').config()
 const authScenarios = require('./authScenarios.js')
 const {
-	TEST_WITH_ASYNC = 0
+	TEST_WITH_ASYNC = 0,
+	VERBOSE_TEST = 0
 } = process.env
 
 async function testAuth(c, li = '') {
@@ -20,11 +21,18 @@ module.exports = {
 	test: testAuth,
 
 	bashTest: async function (c, iterations) {
+		let d = (new Date()).getTime()
 		if (+TEST_WITH_ASYNC) {
 			for (let i = 0; i < iterations; i++) {
 				let li = (i + 1) + ''
 				testAuth(c, li)
 			}
+			if (+VERBOSE_TEST) {
+				let d2 = (new Date()).getTime()
+
+				console.log(`The process took: ${(d2 - d) / 1000 } seconds`)
+			}
+
 		} else {
 			let promises = []
 			for (let i = 0; i < iterations; i++) {
@@ -33,6 +41,11 @@ module.exports = {
 			}
 
 			Promise.all(promises).then(async () => {
+				if (+VERBOSE_TEST) {
+					let d2 = (new Date()).getTime()
+
+					console.log(`The process took: ${(d2 - d) / 1000 } seconds`)
+				}
 				process.exit(0)
 			})
 		}
