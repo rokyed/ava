@@ -6,12 +6,14 @@ const auth = require('./test/auth/auth.js')
 const testMethods = require('./test/methods.js')
 const {
 	APP_PORT = 15000,
+	TEST_APP_PORT=15000,
+	TEST_APP_URL='',
 	TEST = 0,
 	BASH_TEST = 0,
 	BASH_SIZE = 10
 } = process.env
 const config = {
-	host: `http://localhost:${APP_PORT}`,
+	host: `${TEST_APP_URL}:${APP_PORT}`,
 	m: testMethods
 }
 
